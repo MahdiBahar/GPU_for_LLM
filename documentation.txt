@@ -104,7 +104,39 @@ vllm serve ~/.cache/vllm/microsoft_phi-4-mini-instruct \
   --max-num-seqs=1
 
 
-Now, the model is up, e should test it.
+Now, the model is up, we should test it.
+
+run this on terminal:
+uvicorn fastapi_vLLM:app --host 0.0.0.0 --port 8000
+
+Check the system from fastapi localhost address:
+http://localhost:8000/docs
+
+The system works properly. 
+
+Now, the issue is that how can handle concurrency?
+
+for this reseon, I created a new .py code to handle this but it doesnt answer properly when we sent 2 request from two different devices.
+
+To solve this, chatgpt suggested that run the server with these commands:
+
+export VLLM_LOG_STATS=1
+export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
+export HF_HUB_OFFLINE=1
+export TRANSFORMERS_OFFLINE=1
+
+vllm serve   ~/.cache/huggingface/hub/models--microsoft--phi-4-mini-instruct/snapshots/5a149550068a1eb93398160d8953f5f56c3603e9   
+--quantization bitsandbytes   --max-model-len 4096   --enable-chunked-prefill   --max-num-batched-tokens 2048   --max-num-seqs 4
+    --gpu-memory-utilization 0.5 --host 0.0.0.0 --port 8000
 
 
+  It seems that this way is working..
+
+
+Now, I want to send a lot of request to test oncurency. For this reason, I install hey to see this issue 
+and then when my server is up, I run this code to see the perforance of the model in front of concurrency.
+
+hey   -n 40 -c 10  -m POST   -H "Content-Type: application/json"   
+-d '{"prompt":"Hello. What is your idea about quantum computing and its related effects on human life?","max_tokens":20,"temperature":0.7}'  
+ http://localhost:8000/v1/completions
 
