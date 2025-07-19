@@ -3,3 +3,7 @@ pip install \
   --extra-index-url https://download.pytorch.org/whl/cu117 \
   torch torchvision torchaudio \
   vllm transformers sentencepiece
+  huggingface_hub
+
+
+pip install "bitsandbytes>=0.46.1" # for quantization
