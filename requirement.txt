@@ -5,5 +5,5 @@ pip install \
   vllm transformers sentencepiece
   huggingface_hub
 
-
+pip install fastapi uvicorn # for using FastAPI
 pip install "bitsandbytes>=0.46.1" # for quantization
