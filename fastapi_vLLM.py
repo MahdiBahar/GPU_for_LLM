@@ -60,23 +60,23 @@ def completions(req: CompletionRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/v1/chat/completions")
-def chat_completions(req: ChatRequest):
-    try:
-        # concatenate messages into a single prompt
-        system = next((m.content for m in req.messages if m.role == "system"), "")
-        user_msgs = [m.content for m in req.messages if m.role == "user"]
-        prompt = (system + "\n" if system else "") + "\n".join(user_msgs)
+# @app.post("/v1/chat/completions")
+# def chat_completions(req: ChatRequest):
+#     try:
+#         # concatenate messages into a single prompt
+#         system = next((m.content for m in req.messages if m.role == "system"), "")
+#         user_msgs = [m.content for m in req.messages if m.role == "user"]
+#         prompt = (system + "\n" if system else "") + "\n".join(user_msgs)
 
-        llm = get_engine()
-        temperature = req.temperature if req.temperature is not None else 0.7
-        max_tokens = req.max_tokens if req.max_tokens is not None else 128
-        params = SamplingParams(temperature=temperature, max_tokens=max_tokens)
-        out = llm.generate([prompt], params)
-        text = out[0].outputs[0].text
-        return {"choices": [{"message": {"role": "assistant", "content": text}}]}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+#         llm = get_engine()
+#         temperature = req.temperature if req.temperature is not None else 0.7
+#         max_tokens = req.max_tokens if req.max_tokens is not None else 128
+#         params = SamplingParams(temperature=temperature, max_tokens=max_tokens)
+#         out = llm.generate([prompt], params)
+#         text = out[0].outputs[0].text
+#         return {"choices": [{"message": {"role": "assistant", "content": text}}]}
+#     except Exception as e:
+#         raise HTTPException(status_code=500, detail=str(e))
 
 # --- Run with: uvicorn app:app --host 0.0.0.0 --port 8000 ---
 
