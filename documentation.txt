@@ -154,3 +154,18 @@ That out‑of‑memory error is telling you that the 3.8 B‑parameter FP16 sn
 So, I should use quantized model: 
 phi4-mini:3.8b-q8_0
 In fact, the FP16 3.8 B needs more than your 7.7 GiB of free VRAM. If you want to stay on GPU, switch to one of the ‑q8_0 quantized variants (or pick a < 3 B model), and the OOM will disappear.
+
+#### call hey 100 requests with 16 concurrency
+
+vllm serve ~/.cache/huggingface/hub/models--microsoft--phi-4-mini-instruct/snapshots/5a149550068a1eb93398160d8953f5f56c3603e9 \
+  --quantization bitsandbytes --max-model-len 4096 --enable-chunked-prefill \
+  --max-num-batched-tokens 2048 --max-num-seqs 16 --gpu-memory-utilization 0.6 \
+  --host 0.0.0.0 --port 8000
+
+
+ hey   -n 100 -c 16  -m POST   -H "Content-Type: application/json" -d '{"prompt": "Give me a quick summary of quantum computing.",                                                             
+    "max_tokens":128,"temperature":0.7}'  http://localhost:8000/v1/completions
+
+
+ hey -n 100 -c 16 -m POST   -H "Content-Type: application/json"   -d '{"model":"phi4-mini:3.8b-q8_0","prompt": "Give me a quick summary of quantum computing.","max_tokens":128,"temperature":0.7}'   http://localhost:11434/v1/completions
+
